@@ -434,44 +434,7 @@
 
         <div class="notice">
           ※同じ端末から複数回回答した場合は、その分だけリストに表示されます。<br />
-          ※回答内容は後から編集可能です。
-        </div>
-      </div>
-
-      <!-- 右：回答一覧 -->
-      <div class="card">
-        <div class="card-title">みんなの回答状況</div>
-        <div class="card-subtitle">フォームから送信すると、ここに一覧表示されます。</div>
-
-        <div class="summary" id="summary"></div>
-
-        <div class="filter-group">
-          <button class="filter-btn active" data-filter="all">すべて</button>
-          <button class="filter-btn" data-filter="参加">参加のみ</button>
-          <button class="filter-btn" data-filter="欠席">欠席のみ</button>
-        </div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>お名前</th>
-                <th>出欠</th>
-                <th>コメント</th>
-                <th>回答日時</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="responsesBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-<script>
+          <script>
   // ★ここに、Apps Script で発行された WebアプリURL を入れる
   const API_URL = 'https://script.google.com/macros/s/AKfycbzsppI9vPzWf_VNbrWFpWqGiw4eu7sBFQJ-NKD7GFQmbOvuOYCJDmVgbGLtwdwUDZiB/exec';
 
@@ -789,6 +752,350 @@
   initShareUrl();
 </script>
 
+        </div>
+      </div>
+
+      <!-- 右：回答一覧 -->
+      <div class="card">
+        <div class="card-title">みんなの回答状況</div>
+        <div class="card-subtitle">フォームから送信すると、ここに一覧表示されます。</div>
+
+        <div class="summary" id="summary"></div>
+
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">すべて</button>
+          <button class="filter-btn" data-filter="参加">参加のみ</button>
+          <button class="filter-btn" data-filter="欠席">欠席のみ</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>お名前</th>
+                <th>出欠</th>
+                <th>コメント</th>
+                <th>回答日時</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="responsesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+  // ★ここに、Apps Script で発行された WebアプリURL を入れる
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzsppI9vPzWf_VNbrWFpWqGiw4eu7sBFQJ-NKD7GFQmbOvuOYCJDmVgbGLtwdwUDZiB/exec';
+  
+  // 端末ごとの匿名クライアントID（編集履歴用）
+  const CLIENT_ID_KEY = 'tsukuba_young_client_id';
+  let CLIENT_ID = localStorage.getItem(CLIENT_ID_KEY);
+  if (!CLIENT_ID) {
+    CLIENT_ID =
+      Date.now().toString(36) + Math.random().toString(36).slice(2);
+    localStorage.setItem(CLIENT_ID_KEY, CLIENT_ID);
+  }
+
+  // この端末から送った回答のIDリスト
+  const OWN_IDS_KEY = 'tsukuba_young_own_ids';
+
+  const form = document.getElementById("rsvpForm");
+  const responsesBody = document.getElementById("responsesBody");
+  const summaryEl = document.getElementById("summary");
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  const toastEl = document.getElementById("toast");
+  const shareUrlEl = document.getElementById("shareUrl");
+  const copyShareUrlBtn = document.getElementById("copyShareUrlBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const editCancelArea = document.getElementById("editCancelArea");
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+  let responses = [];
+  let currentFilter = "all";
+  let editingId = null;
+  let ownIds = []; // この端末の自分の回答ID
+
+  function loadOwnIds() {
+    try {
+      const json = localStorage.getItem(OWN_IDS_KEY);
+      ownIds = json ? JSON.parse(json) : [];
+    } catch (e) {
+      console.error(e);
+      ownIds = [];
+    }
+  }
+
+  function saveOwnIds() {
+    try {
+      localStorage.setItem(OWN_IDS_KEY, JSON.stringify(ownIds));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function formatDateTime(date) {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    return (
+      d.getFullYear() +
+      "/" + pad(d.getMonth() + 1) +
+      "/" + pad(d.getDate()) +
+      " " + pad(d.getHours()) +
+      ":" + pad(d.getMinutes())
+    );
+  }
+
+  function renderSummary() {
+    const total = responses.length;
+    const joined = responses.filter((r) => r.status === "参加").length;
+    const absent = responses.filter((r) => r.status === "欠席").length;
+
+    summaryEl.innerHTML = `
+      <span class="summary-pill">合計：${total} 件</span>
+      <span class="summary-pill">参加：${joined} 人</span>
+      <span class="summary-pill">欠席：${absent} 人</span>
+    `;
+  }
+
+  function renderTable() {
+    const filtered =
+      currentFilter === "all"
+        ? responses
+        : responses.filter((r) => r.status === currentFilter);
+
+    responsesBody.innerHTML = "";
+    filtered.forEach((r) => {
+      const tr = document.createElement("tr");
+
+      const nameTd = document.createElement("td");
+      nameTd.textContent = r.name;
+
+      const statusTd = document.createElement("td");
+      statusTd.textContent = r.status === "参加" ? "参加" : "欠席";
+      statusTd.className =
+        r.status === "参加" ? "status-参加" : "status-欠席";
+
+      const commentTd = document.createElement("td");
+      commentTd.textContent = r.comment || "";
+
+      const dateTd = document.createElement("td");
+      dateTd.textContent = r.createdAt ? formatDateTime(r.createdAt) : "";
+
+      const actionTd = document.createElement("td");
+      const isMine = ownIds.includes(String(r.id));
+
+      if (isMine) {
+        const actionDiv = document.createElement("div");
+        actionDiv.className = "action-buttons";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "編集";
+        editBtn.className = "action-btn edit";
+        editBtn.dataset.action = "edit";
+        editBtn.dataset.id = r.id;
+
+        actionDiv.appendChild(editBtn);
+        actionTd.appendChild(actionDiv);
+      } else {
+        actionTd.textContent = ""; // 他人の回答には何も表示しない
+      }
+
+      tr.appendChild(nameTd);
+      tr.appendChild(statusTd);
+      tr.appendChild(commentTd);
+      tr.appendChild(dateTd);
+      tr.appendChild(actionTd);
+
+      responsesBody.appendChild(tr);
+    });
+  }
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    setTimeout(() => toastEl.classList.remove("show"), 2000);
+  }
+
+  async function fetchResponses() {
+    try {
+      const res = await fetch(API_URL + '?action=list');
+      const data = await res.json();
+      responses = (data && data.items) || [];
+      renderSummary();
+      renderTable();
+    } catch (e) {
+      console.error(e);
+      showToast("回答の取得に失敗しました");
+    }
+  }
+
+  async function sendAction(action, payload) {
+    const params = new URLSearchParams();
+    params.append("action", action);
+    params.append("clientId", CLIENT_ID);  // ★追加
+    Object.entries(payload || {}).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) {
+        params.append(k, String(v));
+      }
+    });
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: params
+    });
+    
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.error || "unknown_error");
+    }
+    return data;
+  }
+
+  function enterEditMode(entry) {
+    editingId = entry.id;
+    document.getElementById("name").value = entry.name;
+    document.getElementById("comment").value = entry.comment || "";
+    const radio = form.querySelector(
+      `input[name="status"][value="${entry.status}"]`
+    );
+    if (radio) radio.checked = true;
+
+    submitBtn.textContent = "更新する";
+    editCancelArea.style.display = "block";
+    showToast("編集モードに切り替えました");
+  }
+
+  function exitEditMode() {
+    editingId = null;
+    form.reset();
+    const defaultRadio = form.querySelector('input[value="参加"]');
+    if (defaultRadio) defaultRadio.checked = true;
+    submitBtn.textContent = "送信する";
+    editCancelArea.style.display = "none";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const status = (
+      form.querySelector('input[name="status"]:checked') || {}
+    ).value;
+    const comment = document.getElementById("comment").value.trim();
+
+    if (!name) {
+      alert("お名前を入力してください。");
+      return;
+    }
+    if (!status) {
+      alert("出欠を選択してください。");
+      return;
+    }
+
+    submitBtn.disabled = true;
+
+    try {
+      if (editingId !== null) {
+        // 念のため、自分の回答以外は弾く
+        if (!ownIds.includes(String(editingId))) {
+          showToast("この回答は編集できません。");
+        } else {
+          await sendAction("update", {
+            id: editingId,
+            name,
+            status,
+            comment
+          });
+          await fetchResponses();
+          exitEditMode();
+          showToast("回答を更新しました。");
+        }
+      } else {
+        const result = await sendAction("create", {
+          name,
+          status,
+          comment
+        });
+        // 新しい回答IDを自分のIDリストに追加
+        if (result.id) {
+          const idStr = String(result.id);
+          if (!ownIds.includes(idStr)) {
+            ownIds.push(idStr);
+            saveOwnIds();
+          }
+        }
+        await fetchResponses();
+        form.reset();
+        const defaultRadio = form.querySelector('input[value="参加"]');
+        if (defaultRadio) defaultRadio.checked = true;
+        showToast("回答を送信しました。ありがとうございます！");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("送信に失敗しました。時間をおいて再度お試しください。");
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  cancelEditBtn.addEventListener("click", () => {
+    exitEditMode();
+    showToast("編集をキャンセルしました");
+  });
+
+  // 削除アクションはもう扱わない（ボタンも出していない）
+  responsesBody.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+    const entry = responses.find((r) => String(r.id) === String(id));
+    if (!entry) return;
+
+    const isMine = ownIds.includes(String(entry.id));
+    if (!isMine) {
+      showToast("この回答は編集できません。");
+      return;
+    }
+
+    if (action === "edit") {
+      enterEditMode(entry);
+    }
+  });
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filterButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter === "all" ? "all" : btn.dataset.filter;
+      renderTable();
+    });
+  });
+
+  function initShareUrl() {
+    const url = window.location.href;
+    shareUrlEl.textContent = url;
+    copyShareUrlBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast("URLをコピーしました");
+      } catch (e) {
+        console.error(e);
+        showToast("コピーに失敗しました");
+      }
+    });
+  }
+
+  // 初期化：自分のIDを読み込んでから一覧を取得
+  loadOwnIds();
+  fetchResponses();
+  initShareUrl();
+</script>
     
 </body>
 </html>
