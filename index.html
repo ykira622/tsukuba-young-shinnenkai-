@@ -20,7 +20,7 @@
       margin: 0;
       padding: 0;
       max-width: 100%;
-      overflow-x: hidden; /* 横スクロールを強制的に消す */
+      overflow-x: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -35,7 +35,7 @@
 
     .app {
       width: 100%;
-      max-width: 600px;             /* スマホで収まりやすい幅に制限 */
+      max-width: 600px;
       margin: 0 auto;
       background: rgba(255,255,255,0.95);
       border-radius: 20px;
@@ -58,26 +58,20 @@
       border-radius: 24px;
       overflow: hidden;
       border: 4px solid var(--gray);
-      flex-shrink: 0;
     }
-
     .logo-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
     }
 
-    .header-main-texts {
-      flex: 1;
-      min-width: 0;
-    }
+    .header-main-texts { flex: 1; min-width: 0; }
 
     .header-text-main {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 4px;
       color: var(--pink);
+      margin-bottom: 4px;
     }
 
     .header-text-sub {
@@ -93,7 +87,6 @@
     }
 
     .share-url {
-      display: block;
       margin-top: 4px;
       padding: 4px 8px;
       background: #f5f5f5;
@@ -110,10 +103,6 @@
       color: #fff;
       font-size: 11px;
       cursor: pointer;
-    }
-
-    .share-button:hover {
-      opacity: 0.9;
     }
 
     .layout {
@@ -168,22 +157,16 @@
       margin: 6px 0 10px;
       flex-wrap: wrap;
     }
-
     .radio-pill {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 4px;
       padding: 6px 12px;
       border-radius: 999px;
       border: 1px solid #ccc;
-      font-size: 13px;
-      background: #fff;
       cursor: pointer;
     }
-
-    .radio-pill input {
-      accent-color: var(--pink);
-    }
+    .radio-pill input { accent-color: var(--pink); }
 
     .submit-btn {
       margin-top: 10px;
@@ -196,32 +179,36 @@
       font-weight: 700;
       font-size: 15px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      position: relative;
     }
 
-    .submit-btn:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
+    /* ★送信中スピナー */
+    .submit-btn.loading {
+      opacity: 0.8;
+      cursor: default;
     }
-
-    .submit-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    .submit-btn.loading::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      margin-top: -7px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.7);
+      border-top-color: rgba(255,255,255,0.2);
+      animation: spin 0.7s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .edit-cancel {
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--text-sub);
-      text-align: right;
-    }
-
+    .edit-cancel { text-align: right; font-size: 11px; margin-top: 6px; }
     .edit-cancel button {
+      background: none;
       border: none;
-      background: transparent;
       color: var(--pink);
-      cursor: pointer;
       text-decoration: underline;
+      cursor: pointer;
       font-size: 11px;
       padding: 0;
     }
@@ -239,7 +226,6 @@
       font-size: 12px;
       margin-bottom: 10px;
     }
-
     .summary-pill {
       padding: 4px 10px;
       border-radius: 999px;
@@ -250,18 +236,16 @@
       display: flex;
       gap: 6px;
       margin-bottom: 8px;
-      font-size: 12px;
       flex-wrap: wrap;
     }
-
     .filter-btn {
       border-radius: 999px;
       border: 1px solid #ccc;
       padding: 3px 10px;
       background: #fff;
       cursor: pointer;
+      font-size: 12px;
     }
-
     .filter-btn.active {
       background: var(--pink);
       color: #fff;
@@ -271,58 +255,35 @@
     .table-wrapper {
       max-height: 260px;
       overflow-y: auto;
-      overflow-x: auto;   /* 必要なら中だけ横スクロール */
-      width: 100%;
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
-      table-layout: fixed;        /* 幅を強制的にページ内に収める */
-    }
-
-    thead {
-      background: #f5f5f5;
+      table-layout: fixed;
     }
 
     th, td {
       padding: 6px 4px;
       border-bottom: 1px solid #eee;
       text-align: left;
-      vertical-align: top;
-      word-wrap: break-word;
-      word-break: break-word;     /* 長いコメントでも折り返す */
-      white-space: normal;
+      word-break: break-word;
     }
 
-    .status-参加 {
-      color: var(--pink);
-      font-weight: 700;
-    }
-    .status-欠席 {
-      color: #666;
-      font-weight: 600;
-    }
+    .status-参加 { color: var(--pink); font-weight: 700; }
+    .status-欠席 { color: #666; font-weight: 600; }
 
-    .action-buttons {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
+    .action-buttons { display: flex; gap: 4px; }
     .action-btn {
       font-size: 11px;
       padding: 2px 6px;
       border-radius: 6px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--pink);
       background: #fff;
-      cursor: pointer;
-    }
-
-    .action-btn.edit {
-      border-color: var(--pink);
       color: var(--pink);
+      cursor: pointer;
     }
 
     .toast {
@@ -336,114 +297,79 @@
       border-radius: 999px;
       font-size: 12px;
       opacity: 0;
+      transition: opacity .2s;
       pointer-events: none;
-      transition: opacity 0.2s ease;
       z-index: 999;
     }
-    .toast.show {
-      opacity: 0.9;
-    }
+    .toast.show { opacity: 0.9; }
 
-    /* さらに狭いスマホ向け微調整 */
-    @media (max-width: 480px) {
-      body {
-        padding: 16px 8px;
-      }
-      .app {
-        padding: 16px 10px;
-        border-width: 3px;
-      }
-      .logo-box {
-        width: 64px;
-        height: 64px;
-      }
-      .header-text-main {
-        font-size: 17px;
-      }
-      .header-text-sub {
-        font-size: 12px;
-      }
-      .submit-btn {
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="header">
       <div class="logo-box">
-        <img src="logo.png" alt="つくばヤングロゴ" class="logo-image" />
+        <img src="logo.png" class="logo-image" />
       </div>
       <div class="header-main-texts">
         <div class="header-text-main">つくばヤング新年会 出欠フォーム</div>
         <div class="header-text-sub">
-          開催日：2026年1月3日<br />
-          開催場所：つくば駅近<br />
+          開催日：2026年1月3日<br>
+          開催場所：つくば駅近<br>
           参加／欠席とひとことコメントを教えてください。
         </div>
       </div>
       <div class="share-box">
-        <div>▼ 回答依頼用URL</div>
+        ▼ 回答依頼用URL
         <div id="shareUrl" class="share-url">読み込み中...</div>
-        <button class="share-button" id="copyShareUrlBtn">URLをコピー</button>
+        <button id="copyShareUrlBtn" class="share-button">URLをコピー</button>
       </div>
     </div>
 
     <div class="layout">
-      <!-- 左：フォーム -->
       <div class="card">
         <div class="card-title">出欠を回答する</div>
         <div class="card-subtitle">※お名前は参加者リストに表示されます。</div>
 
         <form id="rsvpForm">
-          <div>
-            <label for="name">お名前（必須）</label>
-            <input id="name" type="text" required placeholder="例）つくば 太郎" />
+          <label>お名前（必須）</label>
+          <input id="name" type="text" required>
+
+          <label style="margin-top:10px;">出欠（必須）</label>
+          <div class="radio-group">
+            <label class="radio-pill">
+              <input type="radio" name="status" value="参加" checked> 参加
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="status" value="欠席"> 欠席
+            </label>
           </div>
 
-          <div style="margin-top:10px;">
-            <label>出欠（必須）</label>
-            <div class="radio-group">
-              <label class="radio-pill">
-                <input type="radio" name="status" value="参加" checked /> 参加
-              </label>
-              <label class="radio-pill">
-                <input type="radio" name="status" value="欠席" /> 残念ながら欠席
-              </label>
-            </div>
-          </div>
+          <label>ひとことコメント（任意）</label>
+          <textarea id="comment"></textarea>
 
-          <div>
-            <label for="comment">ひとことコメント（任意）</label>
-            <textarea id="comment" placeholder="例）途中からになるかもですが、よろしくお願いします！"></textarea>
-          </div>
-
-          <button type="submit" class="submit-btn" id="submitBtn">送信する</button>
+          <button class="submit-btn" id="submitBtn" type="submit">送信する</button>
         </form>
 
-        <div class="edit-cancel" id="editCancelArea" style="display:none;">
-          編集モードになっています　
-          <button type="button" id="cancelEditBtn">編集をやめる</button>
+        <div id="editCancelArea" class="edit-cancel" style="display:none;">
+          編集モード　
+          <button id="cancelEditBtn">編集をやめる</button>
         </div>
 
         <div class="notice">
-          ※このフォームから送信された全員分の回答が、下の一覧に表示されます。<br />
-          ※編集できるのは、この端末から送信した回答のみです（削除はできません）。
+          ※全員の回答が下の一覧に表示されます。<br>
+          ※編集できるのはこの端末から送信した回答のみです（削除不可）。
         </div>
       </div>
 
-      <!-- 右：回答一覧 -->
       <div class="card">
         <div class="card-title">みんなの回答状況</div>
-        <div class="card-subtitle">フォームから送信すると、ここに一覧表示されます。</div>
-
         <div class="summary" id="summary"></div>
 
         <div class="filter-group">
           <button class="filter-btn active" data-filter="all">すべて</button>
-          <button class="filter-btn" data-filter="参加">参加のみ</button>
-          <button class="filter-btn" data-filter="欠席">欠席のみ</button>
+          <button class="filter-btn" data-filter="参加">参加</button>
+          <button class="filter-btn" data-filter="欠席">欠席</button>
         </div>
 
         <div class="table-wrapper">
@@ -467,131 +393,55 @@
   <div id="toast" class="toast"></div>
 
   <script>
-    // ★Apps Script の WebアプリURL（必要ならここだけ差し替え）
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzsppI9vPzWf_VNbrWFpWqGiw4eu7sBFQJ-NKD7GFQmbOvuOYCJDmVgbGLtwdwUDZiB/exec';
+    /* ==========================
+       設定
+    =========================== */
+    const API_URL = "https://script.google.com/macros/s/AKfycbzsppI9vPzWf_VNbrWFpWqGiw4eu7sBFQJ-NKD7GFQmbOvuOYCJDmVgbGLtwdwUDZiB/exec";
 
-    // 端末ごとの匿名クライアントID（編集履歴用）
-    const CLIENT_ID_KEY = 'tsukuba_young_client_id';
+    const CLIENT_ID_KEY = "tsukuba_young_client_id";
     let CLIENT_ID = localStorage.getItem(CLIENT_ID_KEY);
     if (!CLIENT_ID) {
-      CLIENT_ID =
-        Date.now().toString(36) + Math.random().toString(36).slice(2);
+      CLIENT_ID = Date.now().toString(36) + Math.random().toString(36).slice(2);
       localStorage.setItem(CLIENT_ID_KEY, CLIENT_ID);
     }
 
-    // この端末から送った回答のIDリスト
-    const OWN_IDS_KEY = 'tsukuba_young_own_ids';
+    const OWN_IDS_KEY = "tsukuba_young_own_ids";
 
+    /* ==========================
+       DOM
+    =========================== */
     const form = document.getElementById("rsvpForm");
-    const responsesBody = document.getElementById("responsesBody");
     const summaryEl = document.getElementById("summary");
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const toastEl = document.getElementById("toast");
-    const shareUrlEl = document.getElementById("shareUrl");
-    const copyShareUrlBtn = document.getElementById("copyShareUrlBtn");
+    const responsesBody = document.getElementById("responsesBody");
     const submitBtn = document.getElementById("submitBtn");
     const editCancelArea = document.getElementById("editCancelArea");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const toastEl = document.getElementById("toast");
+    const shareUrlEl = document.getElementById("shareUrl");
+    const copyShareUrlBtn = document.getElementById("copyShareUrlBtn");
+    const filterButtons = document.querySelectorAll(".filter-btn");
 
+    /* ==========================
+       状態
+    =========================== */
     let responses = [];
-    let currentFilter = "all";
+    let ownIds = [];
     let editingId = null;
-    let ownIds = []; // この端末の自分の回答ID
+    let currentFilter = "all";
 
+    /* ==========================
+       初期化
+    =========================== */
     function loadOwnIds() {
       try {
-        const json = localStorage.getItem(OWN_IDS_KEY);
-        ownIds = json ? JSON.parse(json) : [];
-      } catch (e) {
-        console.error(e);
+        ownIds = JSON.parse(localStorage.getItem(OWN_IDS_KEY)) || [];
+      } catch {
         ownIds = [];
       }
     }
 
     function saveOwnIds() {
-      try {
-        localStorage.setItem(OWN_IDS_KEY, JSON.stringify(ownIds));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    function formatDateTime(date) {
-      const d = new Date(date);
-      if (isNaN(d.getTime())) return "";
-      const pad = (n) => String(n).padStart(2, "0");
-      return (
-        d.getFullYear() +
-        "/" + pad(d.getMonth() + 1) +
-        "/" + pad(d.getDate()) +
-        " " + pad(d.getHours()) +
-        ":" + pad(d.getMinutes())
-      );
-    }
-
-    function renderSummary() {
-      const total = responses.length;
-      const joined = responses.filter((r) => r.status === "参加").length;
-      const absent = responses.filter((r) => r.status === "欠席").length;
-
-      summaryEl.innerHTML = `
-        <span class="summary-pill">合計：${total} 件</span>
-        <span class="summary-pill">参加：${joined} 人</span>
-        <span class="summary-pill">欠席：${absent} 人</span>
-      `;
-    }
-
-    function renderTable() {
-      const filtered =
-        currentFilter === "all"
-          ? responses
-          : responses.filter((r) => r.status === currentFilter);
-
-      responsesBody.innerHTML = "";
-      filtered.forEach((r) => {
-        const tr = document.createElement("tr");
-
-        const nameTd = document.createElement("td");
-        nameTd.textContent = r.name;
-
-        const statusTd = document.createElement("td");
-        statusTd.textContent = r.status === "参加" ? "参加" : "欠席";
-        statusTd.className =
-          r.status === "参加" ? "status-参加" : "status-欠席";
-
-        const commentTd = document.createElement("td");
-        commentTd.textContent = r.comment || "";
-
-        const dateTd = document.createElement("td");
-        dateTd.textContent = r.createdAt ? formatDateTime(r.createdAt) : "";
-
-        const actionTd = document.createElement("td");
-        const isMine = ownIds.includes(String(r.id));
-
-        if (isMine) {
-          const actionDiv = document.createElement("div");
-          actionDiv.className = "action-buttons";
-
-          const editBtn = document.createElement("button");
-          editBtn.textContent = "編集";
-          editBtn.className = "action-btn edit";
-          editBtn.dataset.action = "edit";
-          editBtn.dataset.id = r.id;
-
-          actionDiv.appendChild(editBtn);
-          actionTd.appendChild(actionDiv);
-        } else {
-          actionTd.textContent = ""; // 他人の回答にはボタンを出さない
-        }
-
-        tr.appendChild(nameTd);
-        tr.appendChild(statusTd);
-        tr.appendChild(commentTd);
-        tr.appendChild(dateTd);
-        tr.appendChild(actionTd);
-
-        responsesBody.appendChild(tr);
-      });
+      localStorage.setItem(OWN_IDS_KEY, JSON.stringify(ownIds));
     }
 
     function showToast(msg) {
@@ -600,125 +450,162 @@
       setTimeout(() => toastEl.classList.remove("show"), 2000);
     }
 
+    function formatDateTime(date) {
+      const d = new Date(date);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
     async function fetchResponses() {
-      try {
-        const res = await fetch(API_URL + '?action=list');
-        const data = await res.json();
-        responses = (data && data.items) || [];
-        renderSummary();
-        renderTable();
-      } catch (e) {
-        console.error(e);
-        showToast("回答の取得に失敗しました");
-      }
+      const res = await fetch(API_URL + "?action=list");
+      const data = await res.json();
+      responses = data.items || [];
+      renderSummary();
+      renderTable();
+    }
+
+    function renderSummary() {
+      const total = responses.length;
+      const joined = responses.filter(r => r.status === "参加").length;
+      const absent = responses.filter(r => r.status === "欠席").length;
+
+      summaryEl.innerHTML = `
+        <span class="summary-pill">合計: ${total}</span>
+        <span class="summary-pill">参加: ${joined}</span>
+        <span class="summary-pill">欠席: ${absent}</span>
+      `;
+    }
+
+    function renderTable() {
+      const filtered = currentFilter === "all"
+        ? responses
+        : responses.filter(r => r.status === currentFilter);
+
+      responsesBody.innerHTML = "";
+
+      filtered.forEach(r => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${r.name}</td>
+          <td class="${r.status === "参加" ? "status-参加" : "status-欠席"}">${r.status}</td>
+          <td>${r.comment || ""}</td>
+          <td>${r.createdAt ? formatDateTime(r.createdAt) : ""}</td>
+          <td></td>
+        `;
+
+        // 自分の回答だけ編集ボタン
+        if (ownIds.includes(String(r.id))) {
+          const btn = document.createElement("button");
+          btn.textContent = "編集";
+          btn.className = "action-btn";
+          btn.dataset.action = "edit";
+          btn.dataset.id = r.id;
+
+          tr.children[4].appendChild(btn);
+        }
+
+        responsesBody.appendChild(tr);
+      });
     }
 
     async function sendAction(action, payload) {
       const params = new URLSearchParams();
       params.append("action", action);
-      params.append("clientId", CLIENT_ID);  // 履歴用に端末IDも送る
+      params.append("clientId", CLIENT_ID);
 
-      Object.entries(payload || {}).forEach(([k, v]) => {
-        if (v !== undefined && v !== null) {
-          params.append(k, String(v));
-        }
+      Object.entries(payload).forEach(([k, v]) => {
+        params.append(k, v);
       });
 
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: params
-      });
-      const data = await res.json();
-      if (!data.success) {
-        throw new Error(data.error || "unknown_error");
-      }
-      return data;
+      const res = await fetch(API_URL, { method: "POST", body: params });
+      return await res.json();
     }
 
     function enterEditMode(entry) {
       editingId = entry.id;
-      document.getElementById("name").value = entry.name;
-      document.getElementById("comment").value = entry.comment || "";
-      const radio = form.querySelector(
-        `input[name="status"][value="${entry.status}"]`
-      );
-      if (radio) radio.checked = true;
+      form.name.value = entry.name;
+      form.comment.value = entry.comment || "";
+      form.status.value = entry.status;
 
       submitBtn.textContent = "更新する";
       editCancelArea.style.display = "block";
-      showToast("編集モードに切り替えました");
+
+      showToast("編集モードに入りました");
     }
 
     function exitEditMode() {
       editingId = null;
       form.reset();
-      const defaultRadio = form.querySelector('input[value="参加"]');
-      if (defaultRadio) defaultRadio.checked = true;
       submitBtn.textContent = "送信する";
       editCancelArea.style.display = "none";
     }
 
+    /* ==========================
+       イベント
+    =========================== */
+
+    // フォーム送信
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const status = (
-        form.querySelector('input[name="status"]:checked') || {}
-      ).value;
-      const comment = document.getElementById("comment").value.trim();
 
-      if (!name) {
-        alert("お名前を入力してください。");
-        return;
-      }
-      if (!status) {
-        alert("出欠を選択してください。");
-        return;
-      }
+      const name = form.name.value.trim();
+      const status = form.status.value;
+      const comment = form.comment.value.trim();
 
+      if (!name) return alert("名前を入力してください");
+
+      // 送信中UI
+      const beforeLabel = submitBtn.textContent;
       submitBtn.disabled = true;
+      submitBtn.classList.add("loading");
+      submitBtn.textContent = "送信中...";
 
       try {
-        if (editingId !== null) {
-          // 念のため、自分の回答以外は弾く
+        if (editingId) {
+          // 自分の回答以外は弾く
           if (!ownIds.includes(String(editingId))) {
-            showToast("この回答は編集できません。");
+            showToast("この回答は編集できません");
           } else {
-            await sendAction("update", {
-              id: editingId,
-              name,
-              status,
-              comment
-            });
+            await sendAction("update", { id: editingId, name, status, comment });
             await fetchResponses();
             exitEditMode();
-            showToast("回答を更新しました。");
+            showToast("更新しました");
           }
         } else {
-          const result = await sendAction("create", {
-            name,
-            status,
-            comment
-          });
-          // 新しい回答IDを自分のIDリストに追加
+          const result = await sendAction("create", { name, status, comment });
           if (result.id) {
-            const idStr = String(result.id);
-            if (!ownIds.includes(idStr)) {
-              ownIds.push(idStr);
-              saveOwnIds();
-            }
+            ownIds.push(String(result.id));
+            saveOwnIds();
           }
           await fetchResponses();
           form.reset();
-          const defaultRadio = form.querySelector('input[value="参加"]');
-          if (defaultRadio) defaultRadio.checked = true;
-          showToast("回答を送信しました。ありがとうございます！");
+          showToast("送信しました！");
         }
       } catch (err) {
         console.error(err);
-        alert("送信に失敗しました。時間をおいて再度お試しください。");
+        alert("送信に失敗しました");
       } finally {
         submitBtn.disabled = false;
+        submitBtn.classList.remove("loading");
+        submitBtn.textContent = beforeLabel;
       }
+    });
+
+    // 編集ボタン
+    responsesBody.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+
+      const entry = responses.find(r => String(r.id) === btn.dataset.id);
+      if (!entry) return;
+
+      if (!ownIds.includes(String(entry.id))) {
+        showToast("この回答は編集できません");
+        return;
+      }
+
+      enterEditMode(entry);
     });
 
     cancelEditBtn.addEventListener("click", () => {
@@ -726,53 +613,32 @@
       showToast("編集をキャンセルしました");
     });
 
-    // 削除機能はなし。編集だけ。
-    responsesBody.addEventListener("click", async (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
-      const entry = responses.find((r) => String(r.id) === String(id));
-      if (!entry) return;
-
-      const isMine = ownIds.includes(String(entry.id));
-      if (!isMine) {
-        showToast("この回答は編集できません。");
-        return;
-      }
-
-      if (action === "edit") {
-        enterEditMode(entry);
-      }
-    });
-
-    filterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        filterButtons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentFilter = btn.dataset.filter === "all" ? "all" : btn.dataset.filter;
+    // フィルタ
+    filterButtons.forEach(b =>
+      b.addEventListener("click", () => {
+        filterButtons.forEach(btn => btn.classList.remove("active"));
+        b.classList.add("active");
+        currentFilter = b.dataset.filter;
         renderTable();
-      });
-    });
+      })
+    );
 
+    // URLコピー
     function initShareUrl() {
-      const url = window.location.href;
-      shareUrlEl.textContent = url;
-      copyShareUrlBtn.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(url);
-          showToast("URLをコピーしました");
-        } catch (e) {
-          console.error(e);
-          showToast("コピーに失敗しました");
-        }
-      });
+      shareUrlEl.textContent = location.href;
+      copyShareUrlBtn.onclick = async () => {
+        await navigator.clipboard.writeText(location.href);
+        showToast("コピーしました！");
+      };
     }
 
-    // 初期化
+    /* ==========================
+       実行
+    =========================== */
     loadOwnIds();
     fetchResponses();
     initShareUrl();
+
   </script>
 </body>
 </html>
