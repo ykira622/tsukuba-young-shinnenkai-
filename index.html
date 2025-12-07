@@ -475,6 +475,9 @@
   // ★ここに、Apps Script で発行された WebアプリURL を入れる
   const API_URL = 'https://script.google.com/macros/s/AKfycbzsppI9vPzWf_VNbrWFpWqGiw4eu7sBFQJ-NKD7GFQmbOvuOYCJDmVgbGLtwdwUDZiB/exec';
 
+  // 自分の端末から送った回答のIDを保持するキー
+  const OWN_IDS_KEY = 'tsukuba_young_own_ids';
+
   const form = document.getElementById("rsvpForm");
   const responsesBody = document.getElementById("responsesBody");
   const summaryEl = document.getElementById("summary");
@@ -489,6 +492,25 @@
   let responses = [];
   let currentFilter = "all";
   let editingId = null;
+  let ownIds = []; // この端末から送信した回答のID一覧
+
+  function loadOwnIds() {
+    try {
+      const json = localStorage.getItem(OWN_IDS_KEY);
+      ownIds = json ? JSON.parse(json) : [];
+    } catch (e) {
+      console.error(e);
+      ownIds = [];
+    }
+  }
+
+  function saveOwnIds() {
+    try {
+      localStorage.setItem(OWN_IDS_KEY, JSON.stringify(ownIds));
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   function formatDateTime(date) {
     const d = new Date(date);
@@ -540,24 +562,30 @@
       dateTd.textContent = r.createdAt ? formatDateTime(r.createdAt) : "";
 
       const actionTd = document.createElement("td");
-      const actionDiv = document.createElement("div");
-      actionDiv.className = "action-buttons";
+      const isMine = ownIds.includes(String(r.id));
 
-      const editBtn = document.createElement("button");
-      editBtn.textContent = "編集";
-      editBtn.className = "action-btn edit";
-      editBtn.dataset.action = "edit";
-      editBtn.dataset.id = r.id;
+      if (isMine) {
+        const actionDiv = document.createElement("div");
+        actionDiv.className = "action-buttons";
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "削除";
-      deleteBtn.className = "action-btn delete";
-      deleteBtn.dataset.action = "delete";
-      deleteBtn.dataset.id = r.id;
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "編集";
+        editBtn.className = "action-btn edit";
+        editBtn.dataset.action = "edit";
+        editBtn.dataset.id = r.id;
 
-      actionDiv.appendChild(editBtn);
-      actionDiv.appendChild(deleteBtn);
-      actionTd.appendChild(actionDiv);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "削除";
+        deleteBtn.className = "action-btn delete";
+        deleteBtn.dataset.action = "delete";
+        deleteBtn.dataset.id = r.id;
+
+        actionDiv.appendChild(editBtn);
+        actionDiv.appendChild(deleteBtn);
+        actionTd.appendChild(actionDiv);
+      } else {
+        actionTd.textContent = ""; // 他人の回答はボタンを出さない
+      }
 
       tr.appendChild(nameTd);
       tr.appendChild(statusTd);
@@ -652,21 +680,34 @@
 
     try {
       if (editingId !== null) {
-        await sendAction("update", {
-          id: editingId,
-          name,
-          status,
-          comment
-        });
-        await fetchResponses();
-        exitEditMode();
-        showToast("回答を更新しました。");
+        // 自分の回答以外は更新させない（念のためのガード）
+        if (!ownIds.includes(String(editingId))) {
+          showToast("この回答は編集できません。");
+        } else {
+          await sendAction("update", {
+            id: editingId,
+            name,
+            status,
+            comment
+          });
+          await fetchResponses();
+          exitEditMode();
+          showToast("回答を更新しました。");
+        }
       } else {
-        await sendAction("create", {
+        const result = await sendAction("create", {
           name,
           status,
           comment
         });
+        // 新しく発行されたIDを自分のIDリストに追加
+        if (result.id) {
+          const idStr = String(result.id);
+          if (!ownIds.includes(idStr)) {
+            ownIds.push(idStr);
+            saveOwnIds();
+          }
+        }
         await fetchResponses();
         form.reset();
         const defaultRadio = form.querySelector('input[value="参加"]');
@@ -693,6 +734,12 @@
     const id = btn.dataset.id;
     const entry = responses.find((r) => String(r.id) === String(id));
     if (!entry) return;
+
+    const isMine = ownIds.includes(String(entry.id));
+    if (!isMine) {
+      showToast("この回答は編集・削除できません。");
+      return;
+    }
 
     if (action === "edit") {
       enterEditMode(entry);
@@ -736,7 +783,8 @@
     });
   }
 
-  // 初期化
+  // 初期化：自分のIDを読み込んでから一覧取得
+  loadOwnIds();
   fetchResponses();
   initShareUrl();
 </script>
