@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>つくばヤング新年会 出欠フォーム（2026/1/3）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --pink: #ff0087;
+      --blue: #4cd0ff;
+      --gray: #dfdfdf;
+      --text-main: #222;
+      --text-sub: #555;
+      --bg-card: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--blue);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 12px;
+    }
+
+    .app {
+      max-width: 1000px;
+      width: 100%;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      padding: 24px;
+      border: 4px solid var(--gray);
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 5px solid var(--gray);
+      flex-shrink: 0;
+    }
+
+    .logo-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .header-text-main {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--pink);
+    }
+
+    .header-text-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .share-box {
+      margin-left: auto;
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .share-url {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 4px 8px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      word-break: break-all;
+      max-width: 260px;
+    }
+
+    .share-button {
+      margin-top: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: none;
+      background: var(--pink);
+      color: #fff;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .share-button:hover {
+      opacity: 0.9;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 18px 16px;
+      border: 2px solid var(--gray);
+    }
+
+    .card-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      border-left: 6px solid var(--pink);
+      padding-left: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 12px;
+      margin: 6px 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .radio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .radio-pill input {
+      accent-color: var(--pink);
+    }
+
+    .submit-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: var(--pink);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .submit-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .edit-cancel {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: right;
+    }
+
+    .edit-cancel button {
+      border: none;
+      background: transparent;
+      color: var(--pink);
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 11px;
+      padding: 0;
+    }
+
+    .notice {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 8px;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .summary-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f5f5f5;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      padding: 3px 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background: var(--pink);
+      color: #fff;
+      border-color: var(--pink);
+    }
+
+    .table-wrapper {
+      max-height: 260px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 480px;
+    }
+
+    thead {
+      background: #f5f5f5;
+    }
+
+    th, td {
+      padding: 6px 4px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      white-space: nowrap;
+    }
+
+    .status-参加 {
+      color: var(--pink);
+      font-weight: 700;
+    }
+    .status-欠席 {
+      color: #666;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .action-btn.edit {
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+
+    .action-btn.delete {
+      border-color: #999;
+      color: #666;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 0.9;
+    }
+
+    /* スマホビュー調整 */
+    @media (max-width: 800px) {
+      body {
+        padding: 12px 8px;
+      }
+      .app {
+        padding: 16px 12px;
+        border-width: 3px;
+      }
+      .header {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .share-box {
+        width: 100%;
+        margin-left: 0;
+        text-align: left;
+        margin-top: 8px;
+      }
+      .share-url {
+        max-width: 100%;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        padding: 14px 12px;
+      }
+      .header-text-main {
+        font-size: 18px;
+      }
+      .header-text-sub {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-box {
+        width: 64px;
+        height: 64px;
+        border-width: 4px;
+      }
+      .submit-btn {
+        font-size: 14px;
+        padding: 9px;
+      }
+      table {
+        min-width: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="logo-box">
+        <!-- index.html と同じフォルダに logo.png を置く -->
+        <img src="logo.png" alt="つくばヤングロゴ" class="logo-image" />
+      </div>
+      <div>
+        <div class="header-text-main">つくばヤング新年会 出欠フォーム</div>
+        <div class="header-text-sub">
+          開催日：2026年1月3日<br />
+          開催場所：つくば駅近<br />
+          参加／欠席とひとことコメントを教えてください。
+        </div>
+      </div>
+
+      <div class="share-box">
+        <div>▼ 回答依頼用URL</div>
+        <div id="shareUrl" class="share-url">読み込み中...</div><br />
+        <button class="share-button" id="copyShareUrlBtn">URLをコピー</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- 左：フォーム -->
+      <div class="card">
+        <div class="card-title">出欠を回答する</div>
+        <div class="card-subtitle">※お名前は参加者リストに表示されます。</div>
+
+        <form id="rsvpForm">
+          <div>
+            <label for="name">お名前（必須）</label>
+            <input id="name" type="text" required placeholder="例）つくば 太郎" />
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>出欠（必須）</label>
+            <div class="radio-group">
+              <label class="radio-pill">
+                <input type="radio" name="status" value="参加" checked /> 参加
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="status" value="欠席" /> 残念ながら欠席
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="comment">ひとことコメント（任意）</label>
+            <textarea id="comment" placeholder="例）途中からになるかもですが、よろしくお願いします！"></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">送信する</button>
+        </form>
+
+        <div class="edit-cancel" id="editCancelArea" style="display:none;">
+          編集モードになっています　
+          <button type="button" id="cancelEditBtn">編集をやめる</button>
+        </div>
+
+        <div class="notice">
+          ※同じ端末から複数回回答した場合は、その分だけリストに表示されます。<br />
+          ※本格運用する場合は、サーバー側に保存するよう改修してください（今はこのページのブラウザに保存しています）。
+        </div>
+      </div>
+
+      <!-- 右：回答一覧 -->
+      <div class="card">
+        <div class="card-title">みんなの回答状況</div>
+        <div class="card-subtitle">フォームから送信すると、ここに一覧表示されます。</div>
+
+        <div class="summary" id="summary"></div>
+
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">すべて</button>
+          <button class="filter-btn" data-filter="参加">参加のみ</button>
+          <button class="filter-btn" data-filter="欠席">欠席のみ</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>お名前</th>
+                <th>出欠</th>
+                <th>コメント</th>
+                <th>回答日時</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="responsesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "tsukuba_young_2026_rsvp";
+
+    const form = document.getElementById("rsvpForm");
+    const responsesBody = document.getElementById("responsesBody");
+    const summaryEl = document.getElementById("summary");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const toastEl = document.getElementById("toast");
+    const shareUrlEl = document.getElementById("shareUrl");
+    const copyShareUrlBtn = document.getElementById("copyShareUrlBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const editCancelArea = document.getElementById("editCancelArea");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+    let responses = [];
+    let currentFilter = "all";
+    let editingId = null; // 編集中のID（なければ null）
+
+    function loadFromStorage() {
+      try {
+        const json = localStorage.getItem(STORAGE_KEY);
+        if (json) responses = JSON.parse(json);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function formatDateTime(date) {
+      const d = new Date(date);
+      const pad = (n) => String(n).padStart(2, "0");
+      return (
+        d.getFullYear() +
+        "/" +
+        pad(d.getMonth() + 1) +
+        "/" +
+        pad(d.getDate()) +
+        " " +
+        pad(d.getHours()) +
+        ":" +
+        pad(d.getMinutes())
+      );
+    }
+
+    function renderSummary() {
+      const total = responses.length;
+      const joined = responses.filter((r) => r.status === "参加").length;
+      const absent = responses.filter((r) => r.status === "欠席").length;
+
+      summaryEl.innerHTML = `
+        <span class="summary-pill">合計：${total} 件</span>
+        <span class="summary-pill">参加：${joined} 人</span>
+        <span class="summary-pill">欠席：${absent} 人</span>
+      `;
+    }
+
+    function renderTable() {
+      const filtered =
+        currentFilter === "all"
+          ? responses
+          : responses.filter((r) => r.status === currentFilter);
+
+      responsesBody.innerHTML = "";
+      filtered.forEach((r) => {
+        const tr = document.createElement("tr");
+
+        const nameTd = document.createElement("td");
+        nameTd.textContent = r.name;
+
+        const statusTd = document.createElement("td");
+        statusTd.textContent = r.status === "参加" ? "参加" : "欠席";
+        statusTd.className =
+          r.status === "参加" ? "status-参加" : "status-欠席";
+
+        const commentTd = document.createElement("td");
+        commentTd.textContent = r.comment || "";
+
+        const dateTd = document.createElement("td");
+        dateTd.textContent = formatDateTime(r.createdAt);
+
+        const actionTd = document.createElement("td");
+        const actionDiv = document.createElement("div");
+        actionDiv.className = "action-buttons";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "編集";
+        editBtn.className = "action-btn edit";
+        editBtn.dataset.action = "edit";
+        editBtn.dataset.id = r.id;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "削除";
+        deleteBtn.className = "action-btn delete";
+        deleteBtn.dataset.action = "delete";
+        deleteBtn.dataset.id = r.id;
+
+        actionDiv.appendChild(editBtn);
+        actionDiv.appendChild(deleteBtn);
+        actionTd.appendChild(actionDiv);
+
+        tr.appendChild(nameTd);
+        tr.appendChild(statusTd);
+        tr.appendChild(commentTd);
+        tr.appendChild(dateTd);
+        tr.appendChild(actionTd);
+
+        responsesBody.appendChild(tr);
+      });
+    }
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 2000);
+    }
+
+    function enterEditMode(entry) {
+      editingId = entry.id;
+      document.getElementById("name").value = entry.name;
+      document.getElementById("comment").value = entry.comment || "";
+      const radio = form.querySelector(
+        `input[name="status"][value="${entry.status}"]`
+      );
+      if (radio) radio.checked = true;
+
+      submitBtn.textContent = "更新する";
+      editCancelArea.style.display = "block";
+      showToast("編集モードに切り替えました");
+    }
+
+    function exitEditMode() {
+      editingId = null;
+      form.reset();
+      const defaultRadio = form.querySelector('input[value="参加"]');
+      if (defaultRadio) defaultRadio.checked = true;
+      submitBtn.textContent = "送信する";
+      editCancelArea.style.display = "none";
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const status = (
+        form.querySelector('input[name="status"]:checked') || {}
+      ).value;
+      const comment = document.getElementById("comment").value.trim();
+
+      if (!name) {
+        alert("お名前を入力してください。");
+        return;
+      }
+      if (!status) {
+        alert("出欠を選択してください。");
+        return;
+      }
+
+      if (editingId !== null) {
+        // 既存回答の更新
+        const idx = responses.findIndex((r) => r.id === editingId);
+        if (idx !== -1) {
+          responses[idx].name = name;
+          responses[idx].status = status === "参加" ? "参加" : "欠席";
+          responses[idx].comment = comment;
+        }
+        saveToStorage();
+        renderSummary();
+        renderTable();
+        exitEditMode();
+        showToast("回答を更新しました。");
+      } else {
+        // 新規回答
+        const entry = {
+          id: Date.now(),
+          name,
+          status: status === "参加" ? "参加" : "欠席",
+          comment,
+          createdAt: new Date().toISOString(),
+        };
+
+        responses.push(entry);
+        saveToStorage();
+        renderSummary();
+        renderTable();
+
+        form.reset();
+        const defaultRadio = form.querySelector('input[value="参加"]');
+        if (defaultRadio) defaultRadio.checked = true;
+
+        showToast("回答を送信しました。ありがとうございます！");
+      }
+    });
+
+    cancelEditBtn.addEventListener("click", () => {
+      exitEditMode();
+      showToast("編集をキャンセルしました");
+    });
+
+    // 行の「編集」「削除」ボタン
+    responsesBody.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = Number(btn.dataset.id);
+      const entry = responses.find((r) => r.id === id);
+      if (!entry) return;
+
+      if (action === "edit") {
+        enterEditMode(entry);
+      } else if (action === "delete") {
+        const ok = window.confirm("この回答を削除しますか？");
+        if (!ok) return;
+        responses = responses.filter((r) => r.id !== id);
+        saveToStorage();
+        renderSummary();
+        renderTable();
+        // 編集中に削除された場合のケア
+        if (editingId === id) {
+          exitEditMode();
+        }
+        showToast("回答を削除しました。");
+      }
+    });
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter === "all" ? "all" : btn.dataset.filter;
+        renderTable();
+      });
+    });
+
+    function initShareUrl() {
+      const url = window.location.href;
+      shareUrlEl.textContent = url;
+      copyShareUrlBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("URLをコピーしました");
+        } catch (e) {
+          console.error(e);
+          showToast("コピーに失敗しました");
+        }
+      });
+    }
+
+    loadFromStorage();
+    renderSummary();
+    renderTable();
+    initShareUrl();
+  </script>
+</body>
+</html>
